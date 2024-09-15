@@ -10,10 +10,11 @@ module.exports= {
             .setDescription("In Minutes")
             .setMinValue(0)
             .setMaxValue(525960)
-            .setRequired(true)),
+            .setRequired(true)
+        ),
     async execute(interaction){
-        message = interaction.options.getString("message");
-        minutes = interaction.options.getNumber("time");
+        const message = interaction.options.getString("message");
+        const minutes = interaction.options.getNumber("time");
 
         await interaction.reply({content: `You will be reminded in ${minutes} minutes`, ephemeral: true});
         

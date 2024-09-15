@@ -13,9 +13,13 @@ const flashcardSchema = new Schema({
     content: {
         type: String,
         required: true
+    },
+    createdAt : {
+        type: Date,
+        default: Date.now,
     }
 });
 
-const name = "flashcard";
+const name = "Flashcard";
 
 module.exports = models[name] || model(name, flashcardSchema)
