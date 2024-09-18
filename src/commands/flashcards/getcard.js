@@ -1,6 +1,8 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder } = require("discord.js");
+const { createRevealEmbed, createHideEmbed } = require("../../components/flashcardEmbeds");
+const { getFlashcardByTitle } = require("../../crud/flashcard");
 const Flashcard = require("../../models/flashcard")
-const embedColor = 0xe8d18b
+
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,80 +16,47 @@ module.exports = {
         ),
     async execute(interaction){
         await interaction.deferReply({ephemeral: true});
-
+        
+        let flashcard;
         inputTitle = interaction.options.getString("title");
         try{
-            const flashcard = await Flashcard.findOne({title: inputTitle, userId: interaction.user.id}).lean();
-
+            flashcard = await getFlashcardByTitle(inputTitle, interaction.user.id);
             if(!flashcard){
                 await interaction.editReply({content: `No card with title: **${inputTitle}** found`});
                 return;
             }
-
-            const title = flashcard.title;
-            const content = flashcard.content;
-            
-            //TODO: move embeds to different file
-            const embed = new EmbedBuilder()
-                .setTitle(title)
-                .setColor(embedColor);
-    
-            const row = new ActionRowBuilder()
-                .addComponents(
-                    new ButtonBuilder()
-                        .setCustomId(`toggle-${interaction.id}`)
-                        .setLabel("Reveal Answer")
-                        .setStyle(ButtonStyle.Primary)
-                );
-    
-                await interaction.editReply({ embeds: [embed], components: [row]})
-    
-                const collectorFilter = i => i.user.id === interaction.user.id && i.customId.startsWith("toggle-");
-                const collector = interaction.channel.createMessageComponentCollector({filter: collectorFilter, time: 600000});
-    
-                collector.on("collect", async i => {
-                    if(i.customId === `toggle-${interaction.id}`){
-                        const currentLabel = i.component.label;
-    
-                        if (currentLabel === "Reveal Answer"){
-                            const revealEmbed = new EmbedBuilder()
-                                .setDescription(content)
-                                .setColor(embedColor);
-    
-                            const updatedRow = new ActionRowBuilder()
-                            .addComponents(
-                                new ButtonBuilder()
-                                    .setCustomId(`toggle-${interaction.id}`)
-                                    .setLabel("Hide Answer")
-                                    .setStyle(ButtonStyle.Primary)
-                            );
-                            await i.update({ embeds: [revealEmbed], components: [updatedRow]});
-                        }
-                        else if (currentLabel === "Hide Answer"){       
-                            const hideEmbed = new EmbedBuilder()
-                                .setTitle(title)
-                                .setColor(embedColor);
-                            
-                            const updatedRow = new ActionRowBuilder()
-                            .addComponents(
-                                new ButtonBuilder()
-                                    .setCustomId(`toggle-${interaction.id}`)
-                                    .setLabel("Reveal Answer")
-                                    .setStyle(ButtonStyle.Primary)
-                            );
-        
-                            await i.update({ embeds: [hideEmbed], components: [updatedRow]});
-                        }
-                    }
-                });
-    
-                collector.on("end", async collected => {
-                    await interaction.editReply({ components: []});
-                });
         }
         catch(err){
-            console.error("Error getting flashcard", err);
             await interaction.editReply({content: "There was an error getting the flashcard"});
+            return;
         }
+
+        const title = flashcard.title;
+        const content = flashcard.content;
+        
+        const {embed, row} = createRevealEmbed(title, interaction.id);
+
+        await interaction.editReply({ embeds: [embed], components: [row]})
+
+        const collectorFilter = i => i.user.id === interaction.user.id && i.customId.startsWith("toggle-");
+        const collector = interaction.channel.createMessageComponentCollector({filter: collectorFilter, time: 600000});
+
+        collector.on("collect", async i => {
+            if(i.customId === `toggle-${interaction.id}`){
+                const currentLabel = i.component.label;
+
+                if (currentLabel === "Reveal Content"){
+                    const {embed, row} = createHideEmbed(content, interaction.id);
+                    await i.update({ embeds: [embed], components: [row]});
+                }
+                else if (currentLabel === "Hide Content"){       
+                    const {embed, row} = createRevealEmbed(title, interaction.id);
+                    await i.update({ embeds: [embed], components: [row]});
+                }
+            }
+        });
+        collector.on("end", async collected => {
+            await interaction.editReply({ components: []});
+        });
     },
 };

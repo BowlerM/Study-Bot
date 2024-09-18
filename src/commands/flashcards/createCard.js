@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const Flashcard = require("../../models/flashcard");
+const { createFlashcard, getFlashcardByTitle } = require("../../crud/flashcard");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -16,28 +17,23 @@ module.exports = {
             .setRequired(true)
         ),
     async execute(interaction){
+        await interaction.deferReply({ephemeral: true});
+
         const title = interaction.options.getString("title");
         const content = interaction.options.getString("content");
 
-        existingFlashcard = await Flashcard.findOne({title: title, userId: interaction.user.id});
+        existingFlashcard = await getFlashcardByTitle(title, interaction.user.id)
         if(existingFlashcard){
-            await interaction.reply({content: `Card with title: **${title}** already exists`, ephemeral: true});
+            await interaction.editReply({content: `Card with title: **${title}** already exists`});
             return;
         }
-
-        const flashcard = new Flashcard({
-            title: title,
-            content: content,
-            userId: interaction.user.id
-        })
-
+        
         try{
-            await flashcard.save();
-            await interaction.reply({content: "Flashcard saved successfully", ephemeral: true});
+            await createFlashcard(title, content, interaction.user.id)
+            await interaction.editReply({content: "Flashcard saved successfully"});
         }
         catch(err){
-            console.error("Error saving flashcard", err);
-            await interaction.reply({content: "Error while creating your flashcard", ephemeral: true});
+            await interaction.editReply({content: "Error while creating your flashcard"});
         }
     },
 };
