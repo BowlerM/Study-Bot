@@ -15,7 +15,7 @@ module.exports = {
     async execute(interaction){
         await interaction.deferReply({ephemeral: true});
 
-        inputTitle = interaction.options.getString("title");
+        const inputTitle = interaction.options.getString("title");
         try{
             const flashcard = await Flashcard.findOne({title: inputTitle, userId: interaction.user.id}).lean();
 
