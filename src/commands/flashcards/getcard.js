@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { createRevealEmbed, createHideEmbed } = require("../../components/flashcardEmbeds");
+const { createRevealEmbed, createToggleButtonCollector } = require("../../components/flashcardEmbeds");
 const { getFlashcardByTitle } = require("../../crud/flashcard");
 const Flashcard = require("../../models/flashcard")
 
@@ -36,27 +36,8 @@ module.exports = {
         
         const {embed, row} = createRevealEmbed(title, interaction.id);
 
-        await interaction.editReply({ embeds: [embed], components: [row]})
+        await interaction.editReply({ embeds: [embed], components: [row]});
 
-        const collectorFilter = i => i.user.id === interaction.user.id && i.customId.startsWith("toggle-");
-        const collector = interaction.channel.createMessageComponentCollector({filter: collectorFilter, time: 600000});
-
-        collector.on("collect", async i => {
-            if(i.customId === `toggle-${interaction.id}`){
-                const currentLabel = i.component.label;
-
-                if (currentLabel === "Reveal Content"){
-                    const {embed, row} = createHideEmbed(content, interaction.id);
-                    await i.update({ embeds: [embed], components: [row]});
-                }
-                else if (currentLabel === "Hide Content"){       
-                    const {embed, row} = createRevealEmbed(title, interaction.id);
-                    await i.update({ embeds: [embed], components: [row]});
-                }
-            }
-        });
-        collector.on("end", async collected => {
-            await interaction.editReply({ components: []});
-        });
+        createToggleButtonCollector(interaction, title, content);
     },
 };

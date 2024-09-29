@@ -42,6 +42,28 @@ async function getFlashcardByTitle(title, userId){
 }
 
 /**
+ * 
+ * @param {string} userId - Discord user ID of user getting flashcard
+ * @returns {Object} Flashcard
+ */
+async function getRandomCard(userId){
+    try{
+        const flashcardCount = await Flashcard.countDocuments({userId: userId});
+
+        if(flashcardCount === 0) return null;
+
+        const randomIndex = Math.floor(Math.random() * flashcardCount);
+
+        const randomCard = await Flashcard.findOne({userId: userId}).skip(randomIndex);
+        return randomCard;
+    }
+    catch(err){
+        console.error("Error getting random flashcard: ", err);
+        throw err
+    }
+}
+
+/**
  * Delete a flashcard by its title
  * @param {string} title - Title of flashcard
  * @param {string} userId - Discord user ID of user deleting flashcard
@@ -61,5 +83,6 @@ async function deleteFlashcardByTitle(title, userId){
  module.exports = {
     createFlashcard,
     getFlashcardByTitle,
+    getRandomCard,
     deleteFlashcardByTitle
  }

@@ -45,7 +45,39 @@ function createHideEmbed(content, interactionId){
     return {embed, row};
 }
 
+/**
+ * 
+ * @param {import("discord.js").Interaction} interaction 
+ * @param {string} title 
+ * @param {string} content 
+ */
+function createToggleButtonCollector(interaction, title, content){
+    const collectorFilter = i => i.user.id === interaction.user.id && i.customId.startsWith("toggle-");
+    const collector = interaction.channel.createMessageComponentCollector({ filter: collectorFilter, time: 600000 });
+
+    collector.on("collect", async i => {
+        if (i.customId === `toggle-${interaction.id}`) {
+            const currentLabel = i.component.label;
+
+            if (currentLabel === "Reveal Content") {
+                // Assuming createHideEmbed is an imported function
+                const { embed, row } = createHideEmbed(content, interaction.id);
+                await i.update({ embeds: [embed], components: [row] });
+            } else if (currentLabel === "Hide Content") {
+                // Assuming createRevealEmbed is an imported function
+                const { embed, row } = createRevealEmbed(title, interaction.id);
+                await i.update({ embeds: [embed], components: [row] });
+            }
+        }
+    });
+
+    collector.on("end", async collected => {
+        await interaction.editReply({ components: [] });
+    });
+};
+
 module.exports = {
     createRevealEmbed,
-    createHideEmbed
+    createHideEmbed,
+    createToggleButtonCollector
 }
