@@ -41,4 +41,4 @@ Every time you modify an existing command or add/remove a command run:
 ```bash
 node deploy-commands.js
 ```
-To deploy the command changes to the bot
+To deploy the command changes to the bot.
