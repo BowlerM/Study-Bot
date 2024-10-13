@@ -1,0 +1,6 @@
+{
+    "token": "<your-discord-bot-token>",
+    "clientId": "<discord-id-of-bot>", 
+    "guildId": "<discord-id-of-test-server>",
+    "mongodb_uri": "<your-mogodb-url>"
+}
