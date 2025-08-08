@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require("discord.js");
-const Flashcard = require("../../models/flashcard");
 const { createToggleButtonCollector, createRevealEmbed } = require("../../components/flashcardEmbeds");
 const { getRandomCard } = require("../../crud/flashcard")
 

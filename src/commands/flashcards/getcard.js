@@ -1,8 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { createRevealEmbed, createToggleButtonCollector } = require("../../components/flashcardEmbeds");
-const { getFlashcardByTitle } = require("../../crud/flashcard");
-const Flashcard = require("../../models/flashcard")
-
+const { getFlashcardByTitle} = require("../../crud/flashcard");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,15 +9,15 @@ module.exports = {
         .addStringOption(option => option
             .setName("title")
             .setDescription("Title of card you are trying to get")
-            //TODO: remove required = true to allow user to get all cards by not providing title
             .setRequired(true)
         ),
     async execute(interaction){
         await interaction.deferReply({ephemeral: true});
         
-        let flashcard;
+        let flashcard; 
         const inputTitle = interaction.options.getString("title");
-        try{
+        
+        try{            
             flashcard = await getFlashcardByTitle(inputTitle, interaction.user.id);
             if(!flashcard){
                 await interaction.editReply({content: `No card with title: **${inputTitle}** found`});

@@ -43,6 +43,21 @@ async function getFlashcardByTitle(title, userId){
 
 /**
  * 
+ * @param {string} userId - Discord user ID of user getting flashcards
+ * @returns {Array} Array of Flashcard objects
+ */
+async function getAllFlashcards(userId){
+    try{
+        const flashcards = await Flashcard.find({userId: userId});
+        return flashcards;
+    } catch(err){
+        console.error("Error getting all flashcards: ", err);
+        throw err;
+    }
+}
+
+/**
+ * 
  * @param {string} userId - Discord user ID of user getting flashcard
  * @returns {Object} Flashcard
  */
@@ -83,6 +98,7 @@ async function deleteFlashcardByTitle(title, userId){
  module.exports = {
     createFlashcard,
     getFlashcardByTitle,
+    getAllFlashcards,
     getRandomCard,
     deleteFlashcardByTitle
  }

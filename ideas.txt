@@ -1,0 +1,1 @@
+add theme customisation using a select menu i.e. embed colour by storing colour and guild id in mongo db

@@ -1,5 +1,6 @@
+const { embedColor } = require("./utility.js")
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const embedColor = 0xe8d18b;
+
 
 /**
  * Creates an embed with provided title and reveal content button
@@ -60,11 +61,9 @@ function createToggleButtonCollector(interaction, title, content){
             const currentLabel = i.component.label;
 
             if (currentLabel === "Reveal Content") {
-                // Assuming createHideEmbed is an imported function
                 const { embed, row } = createHideEmbed(content, interaction.id);
                 await i.update({ embeds: [embed], components: [row] });
             } else if (currentLabel === "Hide Content") {
-                // Assuming createRevealEmbed is an imported function
                 const { embed, row } = createRevealEmbed(title, interaction.id);
                 await i.update({ embeds: [embed], components: [row] });
             }
