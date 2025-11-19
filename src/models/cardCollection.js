@@ -1,0 +1,19 @@
+const { Schema, model, models } = require("mongoose");
+
+const cardCollectionSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    owner: {
+        type: Schema.Types.ObjectId, 
+        ref: "User", 
+        required: true
+    },
+    flashcards: [{
+        type: Schema.Types.ObjectId, 
+        ref: "Flashcard"
+    }],
+})
+
+module.exports = models.cardCollection || model("CardCollection", cardCollectionSchema);

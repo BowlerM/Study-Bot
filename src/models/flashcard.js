@@ -1,25 +1,24 @@
 const { Schema, model, models } = require("mongoose");
 
 const flashcardSchema = new Schema({
-    userId: {
-        //Discord User ID
-        type: String,
-        required: true
-    },
     title: {
         type: String,
-        requred: true
+        required: true,
     },
     content: {
         type: String,
-        required: true
+        required: true,
     },
-    createdAt : {
-        type: Date,
-        default: Date.now,
-    }
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
+    cardCollection: {
+        type: Schema.Types.ObjectId,
+        ref: "cardCollection",
+        required: true,
+    },
 });
 
-const name = "Flashcard";
-
-module.exports = models[name] || model(name, flashcardSchema)
+module.exports = models.Flashcard || model("Flashcard", flashcardSchema);
