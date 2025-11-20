@@ -25,6 +25,24 @@ async function getCardCollectionByName(name, discordId){
 }
 
 /**
+ * Returns all of a users card collections
+ * @param {String} discordId User's discord ID
+ * @returns {Array}
+ */
+async function getAllCardCollections(discordId){
+    const user = await getOrCreateUser(discordId);
+
+    try{
+        const cardCollections = await CardCollection.find({owner: user});
+        return cardCollections;
+    }
+    catch(err){
+        console.error("Error getting all card collections", err);
+        throw err;
+    }
+}
+
+/**
  * Creates a collection for flashcards
  * @param {string} name Name of the collection
  * @param {string} discordId User's discord ID
@@ -40,7 +58,7 @@ async function createCardCollection(name, discordId){
             flashcards: []
         });
 
-        cardCollection.save();
+        await cardCollection.save();
         console.log(`${kleur.green().bold("[PUT]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} created colection: ${cardCollection._id}`);
         return cardCollection;
     }
@@ -74,6 +92,7 @@ async function deleteCardCollection(name, discordId){
 
 module.exports = {
     getCardCollectionByName,
+    getAllCardCollections,
     createCardCollection,
     deleteCardCollection
 }
