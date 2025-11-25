@@ -9,7 +9,8 @@ module.exports = {
         await interaction.deferReply({flags: MessageFlags.Ephemeral});
 
         try{
-            const cardCollections = getAllCardCollections(interaction.user.id);
+            //TODO: make paginated embed of all collections
+            const cardCollections = await getAllCardCollections(interaction.user.id);
             await interaction.editReply({content: `Card collections ${cardCollections}`});
         }
         catch(err){

@@ -1,23 +1,34 @@
 const Flashcard = require("../models/flashcard");
+const { getOrCreateUser } = require("../crud/user");
+const { getCardCollectionByName } = require("../crud/cardCollection");
+
 const kleur = require('kleur');
 const moment = require("moment");
 
  /**
-  * Create a new flashcard
-  * @param {string} title Title of the flashcard
-  * @param {string} content Content of the flashcard
-  * @param {string} userId Discord user ID of user creating flashcard
-  * @returns {Object} Created flashcard
-  */
- async function createFlashcard(title, content, userId){
+ * Create a new flashcard
+ * @param {string} collection Collection new card will belong to
+ * @param {string} title Title of the flashcard
+ * @param {string} content Content of the flashcard
+ * @param {string} discordId User's discord ID
+ * @returns {Object} Created flashcard
+*/
+ async function createFlashcard(collection, title, content, discordId){
+    const user = await getOrCreateUser(discordId);
+
     try {
         const flashcard = new Flashcard({
             title: title,
             content: content,
-            userId: userId
+            owner: user,
+            cardCollection: collection
         });
         await flashcard.save();
-        console.log(`${kleur.green().bold("[PUT]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${userId} created flashcard: ${flashcard._id}`);
+
+        collection.flashcards.push(flashcard._id);
+        await collection.save();
+
+        console.log(`${kleur.green().bold("[PUT]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} created flashcard: ${flashcard._id}`);
         return flashcard;
     } catch (err) {
         console.error("Error creating flashcard: ", err);
@@ -27,78 +38,45 @@ const moment = require("moment");
 
 /**
  * Get a flashcard by its title
- * @param {string} title - Title of flashcard (unique)
- * @param {string} userId - Discord user ID of user getting the flashcard
+ * @param {string} collection Collection card belongs too
+ * @param {string} title Title of flashcard 
+ * @param {string} discordId User's discord ID
  * @returns {Object} Flashcard
  */
-async function getFlashcardByTitle(title, userId){
+async function getFlashcardByTitle(collection, title, discordId){
+    const user = await getOrCreateUser(discordId);
+
     try{
-        const flashcard = await Flashcard.findOne({title: title, userId: userId});
-        return flashcard
+        const flashcard = await Flashcard.findOne({cardCollection: collection, title: title, owner: user});
+        return flashcard;
     } catch (err){
         console.error("Error getting flashcard: ", err);
         throw err;
     }
 }
 
-/**
- * 
- * @param {string} userId - Discord user ID of user getting flashcards
- * @returns {Array} Array of Flashcard objects
- */
-async function getAllFlashcards(userId){
-    try{
-        const flashcards = await Flashcard.find({userId: userId});
-        return flashcards;
-    } catch(err){
-        console.error("Error getting all flashcards: ", err);
-        throw err;
-    }
-}
-
-/**
- * 
- * @param {string} userId - Discord user ID of user getting flashcard
- * @returns {Object} Flashcard
- */
-async function getRandomCard(userId){
-    try{
-        const flashcardCount = await Flashcard.countDocuments({userId: userId});
-
-        if(flashcardCount === 0) return null;
-
-        const randomIndex = Math.floor(Math.random() * flashcardCount);
-
-        const randomCard = await Flashcard.findOne({userId: userId}).skip(randomIndex);
-        return randomCard;
-    }
-    catch(err){
-        console.error("Error getting random flashcard: ", err);
-        throw err
-    }
-}
 
 /**
  * Delete a flashcard by its title
- * @param {string} title - Title of flashcard
- * @param {string} userId - Discord user ID of user deleting flashcard
+ * @param {string} colleciton Collection card belongs to
+ * @param {string} title Title of flashcard
+ * @param {string} discordId User's discord ID
  * @returns {void}
  */
-async function deleteFlashcardByTitle(title, userId){
+async function deleteFlashcardByTitle(collection, title, discordId){
+    const user = await getOrCreateUser(discordId);
+
     try{
-        const flashcard = await Flashcard.findOneAndDelete({title: title, userId: userId});
-        console.log(`${kleur.red().bold("[DEL]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${userId} deleted flashcard: ${flashcard._id}`);
+        const flashcard = await Flashcard.findOneAndDelete({cardCollection: collection, title: title, owner: user});
+        console.log(`${kleur.red().bold("[DEL]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} deleted flashcard: ${flashcard._id}`);
     } catch(err){
         console.error("Error deleting flashcard: ", err);
         throw err;
     }
 }
 
-
  module.exports = {
     createFlashcard,
     getFlashcardByTitle,
-    getAllFlashcards,
-    getRandomCard,
     deleteFlashcardByTitle
  }

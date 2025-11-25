@@ -1,11 +1,11 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 const { createCardCollection, getCardCollectionByName } = require("../../crud/cardCollection");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("create_card_collection")
         .setDescription("Creates a collection to store flashcards")
-        .addStringOption(name => name
+        .addStringOption(option => option
             .setName("name")
             .setDescription("Name of collection")
             .setRequired(true)
