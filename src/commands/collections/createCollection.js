@@ -20,13 +20,8 @@ module.exports = {
             await interaction.editReply({content: `Collection with name: **${name}** already exists`});
             return;
         }
-        try{
-            await createCardCollection(name, interaction.user.id);
-            await interaction.editReply({content: "Card collection saved successfully"});
-        }
-        catch(err){
-            await interaction.editReply({content: "Error while creating a card collection"});
-            throw err;
-        }
+
+        await createCardCollection(name, interaction.user.id);
+        await interaction.editReply({content: "Card collection saved successfully"});
     },
 };

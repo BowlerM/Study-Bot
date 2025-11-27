@@ -42,12 +42,7 @@ module.exports = {
             return;
         }
         
-        try{
-            await createFlashcard(collection, title, content, interaction.user.id)
-            await interaction.editReply({content: "Flashcard saved successfully"});
-        }
-        catch(err){
-            await interaction.editReply({content: "Error while creating your flashcard"});
-        }
+        await createFlashcard(collection, title, content, interaction.user.id)
+        await interaction.editReply({content: "Flashcard saved successfully"});
     },
 };

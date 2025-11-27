@@ -34,12 +34,8 @@ module.exports = {
             return;
         }
 
-        try{
-            await deleteFlashcardByTitle(collection, title, interaction.user.id);
-            await interaction.editReply({content: "Flashcard deleted successfully"});
-        }
-        catch(err){
-            await interaction.editReply({content: "Error while deleting your flashcard"});
-        }
+        await deleteFlashcardByTitle(collection, title, interaction.user.id);
+        await interaction.editReply({content: "Flashcard deleted successfully"});
+
     },
 };

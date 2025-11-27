@@ -31,15 +31,10 @@ module.exports = {
             return;
         }
 
-        try{            
-            flashcard = await getFlashcardByTitle(collection, inputTitle, interaction.user.id);
-            if(!flashcard){
-                await interaction.editReply({content: `No card with title: **${inputTitle}** found`});
-                return;
-            }
-        }
-        catch(err){
-            await interaction.editReply({content: "There was an error getting the flashcard"});
+     
+        flashcard = await getFlashcardByTitle(collection, inputTitle, interaction.user.id);
+        if(!flashcard){
+            await interaction.editReply({content: `No card with title: **${inputTitle}** found`});
             return;
         }
 

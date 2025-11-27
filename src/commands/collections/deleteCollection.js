@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, MessageFlags } = require("discord.js");
-const { deleteCardCollection  } = require("../../crud/cardCollection");
+const { deleteCardCollection, getCardCollectionByName  } = require("../../crud/cardCollection");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,13 +14,14 @@ module.exports = {
         await interaction.deferReply({flags: MessageFlags.Ephemeral});
 
         const name = interaction.options.getString("name");
-        try{
-            await deleteCardCollection(name, interaction.user.id);
-            await interaction.editReply({content: "Card collection deleted successfully"});
+
+        const cardCollection = await getCardCollectionByName(name, interaction.user.id);
+        if(!cardCollection){
+            await interaction.editReply({content: `Card collection with name: **${name}** doesn't exist`});
+            return;
         }
-        catch(err){
-            await interaction.editReply({content: "Error occured when trying to delete a card collection"});
-            throw err;
-        }
+
+        await deleteCardCollection(cardCollection, interaction.user.id);
+        await interaction.editReply({content: "Card collection deleted successfully"});
     }
 }

@@ -6,19 +6,14 @@ const User = require("../models/user");
  * @returns {Object} User object
  */
 async function getOrCreateUser(discordId){
-    try{
-        let user = await User.findOne({discordId});
-    
-        if(!user){
-            user = await User.create({discordId});
-        }
-    
-        return user;
+
+    let user = await User.findOne({discordId});
+
+    if(!user){
+        user = await User.create({discordId});
     }
-    catch(err){
-        console.error("Error getting or creating user ", err);
-        throw err;
-    }
+
+    return user;
 }
 
 module.exports = {

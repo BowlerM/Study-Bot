@@ -16,24 +16,20 @@ const moment = require("moment");
  async function createFlashcard(collection, title, content, discordId){
     const user = await getOrCreateUser(discordId);
 
-    try {
-        const flashcard = new Flashcard({
-            title: title,
-            content: content,
-            owner: user,
-            cardCollection: collection
-        });
-        await flashcard.save();
+    const flashcard = new Flashcard({
+        title: title,
+        content: content,
+        owner: user,
+        cardCollection: collection
+    });
+    await flashcard.save();
 
-        collection.flashcards.push(flashcard._id);
-        await collection.save();
+    collection.flashcards.push(flashcard._id);
+    await collection.save();
 
-        console.log(`${kleur.green().bold("[PUT]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} created flashcard: ${flashcard._id}`);
-        return flashcard;
-    } catch (err) {
-        console.error("Error creating flashcard: ", err);
-        throw err;
-    }
+    console.log(`${kleur.green().bold("[PUT]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} created flashcard: ${flashcard._id}`);
+    return flashcard;
+
 }
 
 /**
@@ -46,13 +42,9 @@ const moment = require("moment");
 async function getFlashcardByTitle(collection, title, discordId){
     const user = await getOrCreateUser(discordId);
 
-    try{
-        const flashcard = await Flashcard.findOne({cardCollection: collection, title: title, owner: user});
-        return flashcard;
-    } catch (err){
-        console.error("Error getting flashcard: ", err);
-        throw err;
-    }
+    const flashcard = await Flashcard.findOne({cardCollection: collection, title: title, owner: user});
+    return flashcard;
+
 }
 
 
@@ -66,13 +58,9 @@ async function getFlashcardByTitle(collection, title, discordId){
 async function deleteFlashcardByTitle(collection, title, discordId){
     const user = await getOrCreateUser(discordId);
 
-    try{
-        const flashcard = await Flashcard.findOneAndDelete({cardCollection: collection, title: title, owner: user});
-        console.log(`${kleur.red().bold("[DEL]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} deleted flashcard: ${flashcard._id}`);
-    } catch(err){
-        console.error("Error deleting flashcard: ", err);
-        throw err;
-    }
+    const flashcard = await Flashcard.findOneAndDelete({cardCollection: collection, title: title, owner: user});
+    console.log(`${kleur.red().bold("[DEL]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} deleted flashcard: ${flashcard._id}`);
+
 }
 
  module.exports = {

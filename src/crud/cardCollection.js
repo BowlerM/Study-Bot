@@ -13,15 +13,8 @@ const moment = require("moment");
  */
 async function getCardCollectionByName(name, discordId){
     const user = await getOrCreateUser(discordId);
-
-    try{
-        const cardCollection = await CardCollection.findOne({name: name, owner: user});
-        return cardCollection;
-    }
-    catch(err){
-        console.error("Error getting a card collection", err);
-        throw err;
-    }
+    const cardCollection = await CardCollection.findOne({name: name, owner: user});
+    return cardCollection;
 }
 
 /**
@@ -31,15 +24,8 @@ async function getCardCollectionByName(name, discordId){
  */
 async function getAllCardCollections(discordId){
     const user = await getOrCreateUser(discordId);
-
-    try{
-        const cardCollections = await CardCollection.find({owner: user});
-        return cardCollections;
-    }
-    catch(err){
-        console.error("Error getting all card collections", err);
-        throw err;
-    }
+    const cardCollections = await CardCollection.find({owner: user});
+    return cardCollections;
 }
 
 /**
@@ -51,21 +37,16 @@ async function getAllCardCollections(discordId){
 async function createCardCollection(name, discordId){
     const user = await getOrCreateUser(discordId);
 
-    try{
-        const cardCollection = new CardCollection({
-            name: name,
-            owner: user,
-            flashcards: []
-        });
+    const cardCollection = new CardCollection({
+        name: name,
+        owner: user,
+        flashcards: []
+    });
 
-        await cardCollection.save();
-        console.log(`${kleur.green().bold("[PUT]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} created colection: ${cardCollection._id}`);
-        return cardCollection;
-    }
-    catch(err){
-        console.error("Error creating a card collection", err);
-        throw err;
-    }
+    await cardCollection.save();
+    console.log(`${kleur.green().bold("[PUT]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} created colection: ${cardCollection._id}`);
+    return cardCollection;
+
 }
 
 /**
@@ -74,19 +55,12 @@ async function createCardCollection(name, discordId){
  * @param {string} discordId User's discord ID
  * @returns {void}
  */
-async function deleteCardCollection(name, discordId){
-    try{
-        const cardCollection = await getCardCollectionByName(name, discordId);
+async function deleteCardCollection(cardCollection, discordId){
 
-        await Flashcard.deleteMany({cardCollection: cardCollection._id});
+    await Flashcard.deleteMany({cardCollection: cardCollection._id});
 
-        await cardCollection.deleteOne();
-        console.log(`${kleur.red().bold("[DEL]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} deleted collection: ${cardCollection._id}`);
-    }
-    catch(err){
-        console.error("Error deleting a card collection", err);
-        throw err;
-    }
+    await cardCollection.deleteOne();
+    console.log(`${kleur.red().bold("[DEL]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} deleted collection: ${cardCollection._id}`);
 }
 
 

@@ -14,15 +14,9 @@ module.exports = {
         await interaction.deferReply({flags: MessageFlags.Ephemeral});
 
         const name = interaction.options.getString("name");
-        try{
-            const cardCollection = await getCardCollectionByName(name, interaction.user.id);
-            
-            //TODO: create an embed to display all the information
-            await interaction.editReply({content: `Collection cards ${cardCollection.flashcards}`});
-        }
-        catch(err){
-            await interaction.editReply({content: "Error getting the collection"});
-            throw err;
-        }
+        const cardCollection = await getCardCollectionByName(name, interaction.user.id);
+        
+        //TODO: create an embed to display all the information
+        await interaction.editReply({content: `Collection cards ${cardCollection.flashcards}`});
     }
 }
