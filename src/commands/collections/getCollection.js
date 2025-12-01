@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 const { getCardCollectionByName } = require("../../crud/cardCollection");
+const { getFlashcardsFromCollection } = require("../../crud/flashcard");
+const { createCollectionEmbed } = require("../../components/collectionEmbeds");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -16,7 +18,10 @@ module.exports = {
         const name = interaction.options.getString("name");
         const cardCollection = await getCardCollectionByName(name, interaction.user.id);
         
-        //TODO: create an embed to display all the information
-        await interaction.editReply({content: `Collection cards ${cardCollection.flashcards}`});
+        const flashcards = await getFlashcardsFromCollection(cardCollection, interaction.user.id);
+        
+        const embed = createCollectionEmbed(name, flashcards);
+
+        await interaction.editReply({embeds: [embed]});
     }
 }

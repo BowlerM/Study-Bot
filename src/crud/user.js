@@ -3,7 +3,7 @@ const User = require("../models/user");
 /**
  * Returns a user if they exist or creates a new one and returns it
  * @param {string} discordId - Discord user ID of user
- * @returns {Object} User object
+ * @returns {Promise<User>} Resolves to User object
  */
 async function getOrCreateUser(discordId){
 
@@ -18,4 +18,4 @@ async function getOrCreateUser(discordId){
 
 module.exports = {
     getOrCreateUser
-}
+};

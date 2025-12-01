@@ -10,10 +10,6 @@ const cardCollectionSchema = new Schema({
         ref: "User", 
         required: true
     },
-    flashcards: [{
-        type: Schema.Types.ObjectId, 
-        ref: "Flashcard"
-    }],
 })
 
 module.exports = models.cardCollection || model("CardCollection", cardCollectionSchema);

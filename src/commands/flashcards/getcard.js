@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, MessageFlags } = require("discord.js");
-const { createRevealEmbed, createToggleButtonCollector } = require("../../components/flashcardEmbeds");
+const { createFlashcardRevealEmbed, createFlashcardToggleButtonCollector } = require("../../components/flashcardEmbeds");
 const { getFlashcardByTitle} = require("../../crud/flashcard");
 const { getCardCollectionByName } = require("../../crud/cardCollection");
 

@@ -9,7 +9,7 @@ const moment = require("moment");
  * 
  * @param {string} name Name of collection
  * @param {string} discordId User's discord ID
- * @returns {Object} Card collection
+ * @returns {Promise<CardCollection|null>} Resolves to card collection or null if not found
  */
 async function getCardCollectionByName(name, discordId){
     const user = await getOrCreateUser(discordId);
@@ -20,7 +20,7 @@ async function getCardCollectionByName(name, discordId){
 /**
  * Returns all of a users card collections
  * @param {String} discordId User's discord ID
- * @returns {Array}
+ * @returns {Promise<CardCollection[]>}
  */
 async function getAllCardCollections(discordId){
     const user = await getOrCreateUser(discordId);
@@ -32,7 +32,7 @@ async function getAllCardCollections(discordId){
  * Creates a collection for flashcards
  * @param {string} name Name of the collection
  * @param {string} discordId User's discord ID
- * @returns {Object} Created collection
+ * @returns {Promise<CardCollection>} Resolves to created card collection
  */
 async function createCardCollection(name, discordId){
     const user = await getOrCreateUser(discordId);
@@ -56,7 +56,6 @@ async function createCardCollection(name, discordId){
  * @returns {void}
  */
 async function deleteCardCollection(cardCollection, discordId){
-
     await Flashcard.deleteMany({cardCollection: cardCollection._id});
 
     await cardCollection.deleteOne();
@@ -69,4 +68,4 @@ module.exports = {
     getAllCardCollections,
     createCardCollection,
     deleteCardCollection
-}
+};

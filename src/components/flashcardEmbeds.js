@@ -4,11 +4,11 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("
 
 /**
  * Creates an embed with provided title and reveal content button
- * @param {string} title - Title of flashcard
- * @param {string} interactionId - Unique id for the interaction creating the embed
- * @returns {Object} An object containing the embed and action row (button)
+ * @param {string} title Title of flashcard
+ * @param {string} interactionId Unique id for the interaction creating the embed
+ * @returns {{embed: EmbedBuilder, row: ActionRowBuilder}} An object containing the embed and action row (button)
  */
-function createRevealEmbed(title, interactionId){
+function createFlashcardRevealEmbed(title, interactionId){
     const embed = new EmbedBuilder()
         .setTitle(title)
         .setColor(embedColor);
@@ -26,11 +26,11 @@ function createRevealEmbed(title, interactionId){
 
 /**
  * Creates an embed with provided content and hide content button
- * @param {string} content - Content of flashcard
- * @param {string} interactionId - Unique id for interaction creating the embed
- * @returns {Object} An object containing the embed and action row (button)
+ * @param {string} content Content of flashcard
+ * @param {string} interactionId Unique id for interaction creating the embed
+ * @returns {{embed: EmbedBuilder, row: ActionRowBuilder}} An object containing the embed and action row (button)
  */
-function createHideEmbed(content, interactionId){
+function createFlashcardHideEmbed(content, interactionId){
     const embed = new EmbedBuilder()
         .setDescription(content)
         .setColor(embedColor);
@@ -47,12 +47,13 @@ function createHideEmbed(content, interactionId){
 }
 
 /**
- * 
+ * Creates a collector to handle button presses on a flashcard embed
  * @param {import("discord.js").Interaction} interaction 
  * @param {string} title 
  * @param {string} content 
+ * @returns {void}
  */
-function createToggleButtonCollector(interaction, title, content){
+function createFlashcardToggleButtonCollector(interaction, title, content){
     const collectorFilter = i => i.user.id === interaction.user.id && i.customId.startsWith("toggle-");
     const collector = interaction.channel.createMessageComponentCollector({ filter: collectorFilter, time: 600000 });
 
@@ -76,7 +77,7 @@ function createToggleButtonCollector(interaction, title, content){
 };
 
 module.exports = {
-    createRevealEmbed,
-    createHideEmbed,
-    createToggleButtonCollector
-}
+    createFlashcardRevealEmbed,
+    createFlashcardHideEmbed,
+    createFlashcardToggleButtonCollector
+};
