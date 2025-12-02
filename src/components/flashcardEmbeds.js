@@ -1,7 +1,6 @@
 const { embedColor } = require("./utility.js")
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 
-
 /**
  * Creates an embed with provided title and reveal content button
  * @param {string} title Title of flashcard
@@ -62,10 +61,10 @@ function createFlashcardToggleButtonCollector(interaction, title, content){
             const currentLabel = i.component.label;
 
             if (currentLabel === "Reveal Content") {
-                const { embed, row } = createHideEmbed(content, interaction.id);
+                const { embed, row } = createFlashcardHideEmbed(content, interaction.id);
                 await i.update({ embeds: [embed], components: [row] });
             } else if (currentLabel === "Hide Content") {
-                const { embed, row } = createRevealEmbed(title, interaction.id);
+                const { embed, row } = createFlashcardRevealEmbed(title, interaction.id);
                 await i.update({ embeds: [embed], components: [row] });
             }
         }

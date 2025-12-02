@@ -41,10 +41,10 @@ module.exports = {
         const title = flashcard.title;
         const content = flashcard.content;
         
-        const {embed, row} = createRevealEmbed(title, interaction.id);
+        const {embed, row} = createFlashcardRevealEmbed(title, interaction.id);
 
         await interaction.editReply({ embeds: [embed], components: [row]});
 
-        createToggleButtonCollector(interaction, title, content);
+        createFlashcardToggleButtonCollector(interaction, title, content);
     },
 };

@@ -1,7 +1,7 @@
 const { embedColor } = require("../../components/utility")
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { Pagination } = require("pagination.djs")
-const { getAllFlashcards } = require("../../crud/flashcard");
+const { getAllFlashcardsFromUser } = require("../../crud/flashcard");
 
 
 module.exports = {
@@ -11,18 +11,12 @@ module.exports = {
     async execute(interaction){
         await interaction.deferReply({ephemeral: true});
         
-        let flashcards;
-        try{            
-            flashcards = await getAllFlashcards(interaction.user.id);
-            if(!flashcards){
-                await interaction.editReply({content: "You have no flashcards"});
-                return;
-            }
-        }
-        catch(err){
-            await interaction.editReply({content: "There was an error getting the flashcards"});
+        const flashcards = await getAllFlashcards(interaction.user.id);
+        if(!flashcards){
+            await interaction.editReply({content: "You have no flashcards"});
             return;
         }
+
 
         const pagination = new Pagination(interaction);
         const embeds = []

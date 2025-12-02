@@ -19,7 +19,7 @@ async function getCardCollectionByName(name, discordId){
 
 /**
  * Returns all of a users card collections
- * @param {String} discordId User's discord ID
+ * @param {string} discordId User's discord ID
  * @returns {Promise<CardCollection[]>}
  */
 async function getAllCardCollections(discordId){
@@ -51,21 +51,37 @@ async function createCardCollection(name, discordId){
 
 /**
  * Delete a collection of flashcards
- * @param {string} name Name of the collection
+ * @param {CardCollection} cardCollection Collection to be deleted
  * @param {string} discordId User's discord ID
  * @returns {void}
  */
 async function deleteCardCollection(cardCollection, discordId){
-    await Flashcard.deleteMany({cardCollection: cardCollection._id});
+    const user = await getOrCreateUser(discordId);
+
+    await Flashcard.deleteMany({cardCollection: cardCollection._id, owner: user});
 
     await cardCollection.deleteOne();
     console.log(`${kleur.red().bold("[DEL]")} ${moment().format("DD-MM-YYYY HH:mm:ss")} User: ${discordId} deleted collection: ${cardCollection._id}`);
+}
+
+/**
+ * 
+ * @param {CardCollection} cardCollection Collection to be queried against
+ * @param {string} discordId User's discord ID
+ * @returns {number} Number of cards in the collection
+ */
+async function getCardCountForCollection(cardCollection, discordId){
+    const user = await getOrCreateUser(discordId);
+
+    const count = await Flashcard.countDocuments({cardCollection: cardCollection, owner: user});
+    return count;
 }
 
 
 module.exports = {
     getCardCollectionByName,
     getAllCardCollections,
+    getCardCountForCollection,
     createCardCollection,
     deleteCardCollection
 };

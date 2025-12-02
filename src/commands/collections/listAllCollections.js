@@ -1,6 +1,6 @@
 const { embedColor } = require("../../components/utility")
-const { SlashCommandBuilder, MessageFlags, EmbedBuilder } = require("discord.js");
-const { getAllCardCollections } = require("../../crud/cardCollection");
+const { SlashCommandBuilder, MessageFlags, EmbedBuilder, EntryPointCommandHandlerType } = require("discord.js");
+const { getAllCardCollections, getCardCountForCollection } = require("../../crud/cardCollection");
 const { Pagination } = require("pagination.djs");
 
 module.exports = {
@@ -30,7 +30,10 @@ module.exports = {
             
             let embedDescription = "";
             for(let j = 0; j < collectionChunk.length; j++){
-                collectionDescription = `${j + i + 1} - ${collectionChunk[j].name} (${collectionChunk[j].flashcards.length} Flashcards)`;
+                const collection = collectionChunk[j];
+                const numOfCards = await getCardCountForCollection(collection, interaction.user.id);
+
+                collectionDescription = `${j + i + 1} - ${collection.name} (${numOfCards} Flashcards)`;
                 embedDescription = embedDescription.concat(collectionDescription, "\n");
             }
             newEmbed.setDescription(embedDescription);

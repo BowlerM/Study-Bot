@@ -6,7 +6,7 @@ const moment = require("moment");
 
  /**
  * Create a new flashcard
- * @param {string} collection Collection new card will belong to
+ * @param {CardCollection} collection Collection new card will belong to
  * @param {string} title Title of the flashcard
  * @param {string} content Content of the flashcard
  * @param {string} discordId User's discord ID
@@ -29,7 +29,7 @@ const moment = require("moment");
 
 /**
  * Get a flashcard by its title
- * @param {mongoose.Types.ObjectId} collection Collection card belongs too
+ * @param {CardCollection} collection Collection card belongs too
  * @param {string} title Title of flashcard 
  * @param {string} discordId User's discord ID
  * @returns {Promise<Flashcard|null>} Resolves to flashcard object or null if not found
@@ -44,7 +44,7 @@ async function getFlashcardByTitle(collection, title, discordId){
 
 /**
  * 
- * @param {mongoose.Types.ObjectId} collection Collection cards belong to
+ * @param {CardCollection} collection Collection cards belong to
  * @param {string} discordId User's discord ID
  * @returns {Promise<Flashcard[]>} Resolves to array of flashcards
  */

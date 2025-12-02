@@ -14,7 +14,7 @@ function createCollectionEmbed(name, flashcards){
         collectionDescription = "No flashcards in this collection"
     }
     else{
-        collectionDescription = `**${flashcards.length}** Flashcard${flashcards.length !== 1 ? "s" : ""} in collection:\n`;
+        collectionDescription = `**${flashcards.length}** Flashcard${flashcards.length === 1 ? "" : "s"} in collection:\n`;
 
         collectionDescription += flashcards
             .slice(0,10)
