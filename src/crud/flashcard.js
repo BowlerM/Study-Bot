@@ -56,6 +56,19 @@ async function getFlashcardsFromCollection(collection, discordId){
 }
 
 
+async function getFlashcards(discordId, {populateCollection = false} = {}){
+    const user = await getOrCreateUser(discordId);
+
+    let query = Flashcard.find({owner: user});
+
+    if(populateCollection){
+        query = query.populate("cardCollection");
+    }
+
+    return query.exec();
+}
+
+
 /**
  * Delete a flashcard by its title
  * @param {string} colleciton Collection card belongs to
@@ -74,5 +87,6 @@ async function deleteFlashcardByTitle(collection, title, discordId){
     createFlashcard,
     getFlashcardByTitle,
     getFlashcardsFromCollection,
+    getFlashcards,
     deleteFlashcardByTitle
 };

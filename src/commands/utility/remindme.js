@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 
 module.exports= {
     data: new SlashCommandBuilder()
@@ -16,10 +16,10 @@ module.exports= {
         const message = interaction.options.getString("message");
         const minutes = interaction.options.getNumber("time");
 
-        await interaction.reply({content: `You will be reminded in ${minutes} minutes`, ephemeral: true});
+        await interaction.reply({content: `You will be reminded in ${minutes} minutes`, flags: MessageFlags.Ephemeral});
         
         setTimeout(() =>{
-            interaction.followUp({content: message, ephemeral: true});
+            interaction.followUp({content: message, flags: MessageFlags.Ephemeral});
         }, minutes * 60000);
     },
 };

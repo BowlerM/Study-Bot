@@ -1,7 +1,7 @@
 const { embedColor } = require("../../components/utility")
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js");
 const { Pagination } = require("pagination.djs")
-const { getAllFlashcardsFromUser } = require("../../crud/flashcard");
+const { getFlashcards } = require("../../crud/flashcard");
 
 
 module.exports = {
@@ -9,14 +9,15 @@ module.exports = {
         .setName("list_all_flashcards")
         .setDescription("Get a list of flashcards that you have saved"),
     async execute(interaction){
-        await interaction.deferReply({ephemeral: true});
+        await interaction.deferReply({flags: MessageFlags.Ephemeral});
         
-        const flashcards = await getAllFlashcards(interaction.user.id);
+        const flashcards = await getFlashcards(interaction.user.id, {populateCollection: true});
         if(!flashcards){
             await interaction.editReply({content: "You have no flashcards"});
             return;
         }
 
+        flashcards.sort((a, b) => a.cardCollection.name.localeCompare(b.cardCollection.name));
 
         const pagination = new Pagination(interaction);
         const embeds = []
@@ -30,8 +31,11 @@ module.exports = {
             .setColor(embedColor);
             
             let embedDescription = "";
+
             for(let j = 0; j < cardChunk.length; j++){
-                cardDescription = `${j + i + 1} - ${cardChunk[j].title}`;
+                const card = cardChunk[j];
+            
+                cardDescription = `${j + i + 1} - **Title**: ${card.title} **Collection**: ${card.cardCollection.name}`;
                 embedDescription = embedDescription.concat(cardDescription, "\n");
             }
             newEmbed.setDescription(embedDescription);
