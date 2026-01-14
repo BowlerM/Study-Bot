@@ -1,4 +1,4 @@
-const { embedColor } = require("./utility.js")
+const { DEFAULT_EMBED_COLOR } = require("../constants/colors");
 const { EmbedBuilder } = require("discord.js");
 
 /**
@@ -29,7 +29,7 @@ function createCollectionEmbed(name, flashcards){
 
     const embed = new EmbedBuilder()
         .setTitle(name)
-        .setColor(embedColor)
+        .setColor(DEFAULT_EMBED_COLOR)
         .setDescription(collectionDescription);
 
     

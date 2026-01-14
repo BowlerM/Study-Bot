@@ -1,4 +1,4 @@
-const { embedColor } = require("./utility.js")
+const { DEFAULT_EMBED_COLOR } = require("../constants/colors");
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 
 /**
@@ -10,7 +10,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("
 function createFlashcardRevealEmbed(title, interactionId){
     const embed = new EmbedBuilder()
         .setTitle(title)
-        .setColor(embedColor);
+        .setColor(DEFAULT_EMBED_COLOR);
 
     const row = new ActionRowBuilder()
         .addComponents(
@@ -32,7 +32,7 @@ function createFlashcardRevealEmbed(title, interactionId){
 function createFlashcardHideEmbed(content, interactionId){
     const embed = new EmbedBuilder()
         .setDescription(content)
-        .setColor(embedColor);
+        .setColor(DEFAULT_EMBED_COLOR);
 
     const row = new ActionRowBuilder()
         .addComponents(

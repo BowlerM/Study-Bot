@@ -1,7 +1,9 @@
-const { embedColor } = require("../../components/utility")
+const { DEFAULT_EMBED_COLOR } = require("../../constants/colors")
 const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js");
 const { Pagination } = require("pagination.djs")
 const { getFlashcards } = require("../../crud/flashcard");
+const { DISCORD_LIMITS } = require("../../constants/discordLimits");
+const { APP_LIMITS } = require("../../constants/appLimits");
 
 
 module.exports = {
@@ -17,31 +19,57 @@ module.exports = {
             return;
         }
 
+        //TODO: add a user set language setting to pass into localCompare
         flashcards.sort((a, b) => a.cardCollection.name.localeCompare(b.cardCollection.name));
 
         const pagination = new Pagination(interaction);
-        const embeds = []
-        const flashcardsPerPage = 25;
+        const embeds = [];
 
-        for(let i = 0; i < flashcards.length; i += flashcardsPerPage){
-            const cardChunk = flashcards.slice(i, i + flashcardsPerPage);
+        let currentEmbed = new EmbedBuilder()
+                        .setTitle("Page 1")
+                        .setColor(DEFAULT_EMBED_COLOR)
+        let currentDescription = "";
+        let currentCollection = "";
+        let pageNum = 1;
+        let currentLineCount = 0;
+        
+        for(let i = 0; i < flashcards.length; i++){
+            const flashcard = flashcards[i];
 
-            const newEmbed = new EmbedBuilder()
-            .setTitle(`Page ${i + 1}`)
-            .setColor(embedColor);
-            
-            let embedDescription = "";
-
-            for(let j = 0; j < cardChunk.length; j++){
-                const card = cardChunk[j];
-            
-                cardDescription = `${j + i + 1} - **Title**: ${card.title} **Collection**: ${card.cardCollection.name}`;
-                embedDescription = embedDescription.concat(cardDescription, "\n");
+            let line = "";
+            if(flashcard.cardCollection.name !== currentCollection){
+                currentCollection = flashcard.cardCollection.name;
+                line += `▸ **${currentCollection}**\n`;
+                currentLineCount++;
             }
-            newEmbed.setDescription(embedDescription);
 
-            embeds.push(newEmbed);
+            line += `\u200B \u200B \u200B \u200B ▸ ${flashcard.title}\n`;
+            currentLineCount++;
+
+            const exceedsChars = (currentDescription.length + line.length) > DISCORD_LIMITS.EMBED.DESCRIPTION_LENGTH;
+            const exceedsLines = currentLineCount > APP_LIMITS.EMBED.MAX_LINE_COUNT;
+            
+            if(exceedsChars || exceedsLines){
+                currentEmbed.setDescription(currentDescription);
+                embeds.push(currentEmbed);
+
+                pageNum++;
+                currentEmbed = new EmbedBuilder()
+                            .setTitle(`Page ${pageNum}`)
+                            .setColor(DEFAULT_EMBED_COLOR);
+                currentDescription = line;
+                currentLineCount = 1;
+            }
+            else{
+                currentDescription += line;
+            }
+
         }
+        if (currentDescription.length > 0) {
+            currentEmbed.setDescription(currentDescription);
+            embeds.push(currentEmbed);
+        }
+
         pagination.setEmbeds(embeds);
         pagination.render();
     },

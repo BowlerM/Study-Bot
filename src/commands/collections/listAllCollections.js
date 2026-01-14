@@ -1,5 +1,7 @@
-const { embedColor } = require("../../components/utility")
-const { SlashCommandBuilder, MessageFlags, EmbedBuilder, EntryPointCommandHandlerType } = require("discord.js");
+const { DEFAULT_EMBED_COLOR } = require("../../constants/colors")
+const { SlashCommandBuilder, MessageFlags, EmbedBuilder } = require("discord.js");
+const { DISCORD_LIMITS } = require("../../constants/discordLimits");
+const { APP_LIMITS } = require("../../constants/appLimits");
 const { getAllCardCollections, getCardCountForCollection } = require("../../crud/cardCollection");
 const { Pagination } = require("pagination.djs");
 
@@ -9,7 +11,7 @@ module.exports = {
         .setDescription("Lists all your collections of cards"),
     async execute(interaction){
         await interaction.deferReply({flags: MessageFlags.Ephemeral});
-
+        
         const cardCollections = await getAllCardCollections(interaction.user.id);
 
         if(!cardCollections || cardCollections.length === 0){
@@ -18,28 +20,48 @@ module.exports = {
         }
 
         const pagination = new Pagination(interaction);
-        const embeds = []
-        const collectionsPerPage = 25;
-        
-        for(let i = 0; i < cardCollections.length; i += collectionsPerPage){
-            const collectionChunk = cardCollections.slice(i, i + collectionsPerPage);
+        const embeds = [];
 
-            const newEmbed = new EmbedBuilder()
-            .setTitle(`Page ${i + 1}`)
-            .setColor(embedColor);
-            
-            let embedDescription = "";
-            for(let j = 0; j < collectionChunk.length; j++){
-                const collection = collectionChunk[j];
-                const numOfCards = await getCardCountForCollection(collection, interaction.user.id);
+        let currentEmbed = new EmbedBuilder()
+            .setTitle("Page 1")
+            .setColor(DEFAULT_EMBED_COLOR);
+        let currentDescription = "";
+        let currentLineCount = 0;
+        let pageNum = 1;
 
-                collectionDescription = `${j + i + 1} - ${collection.name} (${numOfCards} Flashcards)`;
-                embedDescription = embedDescription.concat(collectionDescription, "\n");
+        for(let i = 0; i < cardCollections.length; i++){
+            const cardCollection = cardCollections[i];
+            const numOfCards = await getCardCountForCollection(cardCollection, interaction.user.id);
+
+            const line = `${i + 1} - ${cardCollection.name} (${numOfCards} Flashcards)\n`;
+            currentLineCount++;
+
+            //Dont let embed description surpass discords length restraint or app defined line count
+            const exceedsChars = (currentDescription.length + line.length) > DISCORD_LIMITS.EMBED.DESCRIPTION_LENGTH;
+            const exceedsLines = currentLineCount > APP_LIMITS.EMBED.MAX_LINE_COUNT;
+
+            if(exceedsChars || exceedsLines){
+                currentEmbed.setDescription(currentDescription);
+                embeds.push(currentEmbed);
+
+                pageNum++;
+                currentEmbed = new EmbedBuilder()
+                            .setTitle(`Page ${pageNum}`)
+                            .setColor(DEFAULT_EMBED_COLOR);
+                currentDescription = line;
+                currentLineCount = 1;
+                
             }
-            newEmbed.setDescription(embedDescription);
-
-            embeds.push(newEmbed);
+            else{
+                currentDescription += line
+            }
         }
+
+        if(currentDescription.length > 0){
+            currentEmbed.setDescription(currentDescription);
+            embeds.push(currentEmbed);
+        }
+            
         pagination.setEmbeds(embeds);
         pagination.render();
     }
